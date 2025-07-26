@@ -1,18 +1,10 @@
 Here's the markdown format for your project information:
 
 ```markdown
-# 🚀 Dockerized Flask WebApp Deployment using Ansible (Part-1)
+# 🚀 Dockerized Flask WebApp Deployment using Ansible 
 
 This project demonstrates how to automate the deployment of a Dockerized Flask web application using Ansible on an AWS EC2 instance. It also includes a multi-container deployment setup using Ansible.
 
-<h1 align="center" style="color:#2E86C1">🚀 Dockerized Flask WebApp Deployment using Ansible (Part-1)</h1>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Flask-Application-blue?style=flat-square&logo=flask" />
-  <img src="https://img.shields.io/badge/Ansible-Automation-red?style=flat-square&logo=ansible" />
-  <img src="https://img.shields.io/badge/Docker-Containerized-blue?style=flat-square&logo=docker" />
-  <img src="https://img.shields.io/badge/AWS-EC2-orange?style=flat-square&logo=amazonaws" />
-</p>
 
 ---
 
