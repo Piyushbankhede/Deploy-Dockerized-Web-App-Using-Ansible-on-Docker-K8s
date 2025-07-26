@@ -1,0 +1,37 @@
+---
+- name: Build, push, and run Flask Docker container via Ansible
+  hosts: localhost
+  vars:
+    docker_username: ""
+    docker_password: ""  # ⚠️ Use ansible-vault for real projects
+    image_name: "ansible-dockerized-app"
+    full_image_name: "{{ docker_username }}/{{ image_name }}:latest"
+    build_path: "/tmp/webapp"
+  tasks:
+
+    - name: Copy webapp files to /tmp/webapp
+      copy:
+        src: ../webapp/
+        dest: "{{ build_path }}"
+        mode: '0755'
+
+    - name: Build Docker image from copied webapp
+      command: docker build -t {{ full_image_name }} .
+      args:
+        chdir: "{{ build_path }}"
+
+    - name: Login to Docker Hub
+      command: docker login -u {{ docker_username }} -p {{ docker_password }}
+      no_log: true
+
+    - name: Push Docker image to Docker Hub
+      command: docker push {{ full_image_name }}
+
+    - name: Remove old Docker container if it exists
+      command: docker rm -f ansible-flask-container
+      ignore_errors: true
+
+    - name: Run Docker container and expose it on port 5000
+      command: >
+        docker run -d --name ansible-flask-container
+        -p 5000:5000 {{ full_image_name }}

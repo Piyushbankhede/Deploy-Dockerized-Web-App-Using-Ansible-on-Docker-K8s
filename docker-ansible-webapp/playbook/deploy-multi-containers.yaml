@@ -1,0 +1,45 @@
+---
+- name: Build, push, and run Flask Docker containers via Ansible
+  hosts: localhost
+  vars:
+    docker_username: ""
+    docker_password: ""  # ⚠️ Use ansible-vault in production
+    image_name: "ansible-dockerized-app"
+    full_image_name: "{{ docker_username }}/{{ image_name }}:latest"
+    build_path: "/tmp/webapp"
+    container_count: 4  # Change to increase/decrease containers
+
+  tasks:
+
+    - name: Copy webapp files to /tmp/webapp
+      copy:
+        src: ../webapp/
+        dest: "{{ build_path }}"
+        mode: '0755'
+
+    - name: Build Docker image from copied webapp
+      command: docker build -t {{ full_image_name }} .
+      args:
+        chdir: "{{ build_path }}"
+
+    - name: Login to Docker Hub
+      command: docker login -u {{ docker_username }} -p {{ docker_password }}
+      no_log: true
+
+    - name: Push Docker image to Docker Hub
+      command: docker push {{ full_image_name }}
+
+    - name: Remove existing containers (if any)
+      shell: |
+        for i in $(seq 1 {{ container_count }}); do
+          docker rm -f ansible-flask-container-$i || true
+        done
+
+    - name: Run {{ container_count }} Docker containers with unique ports
+      loop: "{{ range(1, container_count + 1) | list }}"
+      vars:
+        container_name: "ansible-flask-container-{{ item }}"
+        host_port: "{{ 5000 + item - 1 }}"
+      command: >
+        docker run -d --name {{ container_name }}
+        -p {{ host_port }}:5000 {{ full_image_name }}
